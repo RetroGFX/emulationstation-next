@@ -170,12 +170,12 @@ std::string ApiSystem::getVersion(bool extra)
 
 std::string ApiSystem::getApplicationName()
 {
-	return "ROCKNIX";
+	return "UNOFFICIALOS";
 }
 
 bool ApiSystem::setOverscan(bool enable) 
 {
-	return executeScript("rocknix-config overscan " + std::string(enable ? "enable" : "disable"));
+	return executeScript("unofficialos-config overscan " + std::string(enable ? "enable" : "disable"));
 }
 
 bool ApiSystem::setOverclock(std::string mode) 
@@ -191,7 +191,7 @@ std::pair<std::string, int> ApiSystem::updateSystem(const std::function<void(con
 {
 	LOG(LogDebug) << "ApiSystem::updateSystem";
 
-	std::string updatecommand = "rocknix-update";
+	std::string updatecommand = "unofficialos-update";
 
 	FILE *pipe = popen(updatecommand.c_str(), "r");
 	if (pipe == nullptr)
@@ -224,7 +224,7 @@ std::pair<std::string, int> ApiSystem::backupSystem(BusyComponent* ui, std::stri
 {
 	LOG(LogDebug) << "ApiSystem::backupSystem";
 
-	std::string updatecommand = "rocknix-sync sync " + device;
+	std::string updatecommand = "unofficialos-sync sync " + device;
 	FILE* pipe = popen(updatecommand.c_str(), "r");
 	if (pipe == NULL)
 		return std::pair<std::string, int>(std::string("Cannot call sync command"), -1);
@@ -283,7 +283,7 @@ std::pair<std::string, int> ApiSystem::scrape(BusyComponent* ui)
 {
 	LOG(LogDebug) << "ApiSystem::scrape";
 
-	FILE* pipe = popen("rocknix-scraper", "r");
+	FILE* pipe = popen("unofficialos-scraper", "r");
 	if (pipe == nullptr)
 		return std::pair<std::string, int>(std::string("Cannot call scrape command"), -1);
 
@@ -328,7 +328,7 @@ bool ApiSystem::canUpdate(std::vector<std::string>& output)
 {
 	LOG(LogDebug) << "ApiSystem::canUpdate";
 
-	FILE *pipe = popen("rocknix-update check", "r");
+	FILE *pipe = popen("unofficialos-update check", "r");
 	if (pipe == NULL)
 		return false;
 
@@ -472,57 +472,57 @@ int ApiSystem::GetTotalRam()
 
 bool ApiSystem::enableBluetooth()
 {
-	return executeScript("rocknix-bluetooth enable 2>&1 >/dev/null");
+	return executeScript("unofficialos-bluetooth enable 2>&1 >/dev/null");
 }
 
 bool ApiSystem::disableBluetooth()
 {
-	return executeScript("rocknix-bluetooth disable");
+	return executeScript("unofficialos-bluetooth disable");
 }
 
 void ApiSystem::startBluetoothLiveDevices(const std::function<void(const std::string)>& func)
 {
-	executeScript("rocknix-bluetooth live_devices", func);
+	executeScript("unofficialos-bluetooth live_devices", func);
 }
 
 void ApiSystem::stopBluetoothLiveDevices()
 {
-	executeScript("rocknix-bluetooth stop_live_devices");
+	executeScript("unofficialos-bluetooth stop_live_devices");
 }
 
 bool ApiSystem::pairBluetoothDevice(const std::string& deviceName)
 {
-	return executeScript("rocknix-bluetooth trust " + deviceName);
+	return executeScript("unofficialos-bluetooth trust " + deviceName);
 }
 
 bool ApiSystem::connectBluetoothDevice(const std::string& deviceName)
 {
-	return executeScript("rocknix-bluetooth connect " + deviceName);
+	return executeScript("unofficialos-bluetooth connect " + deviceName);
 }
 
 bool ApiSystem::disconnectBluetoothDevice(const std::string& deviceName)
 {
-	return executeScript("rocknix-bluetooth disconnect " + deviceName);
+	return executeScript("unofficialos-bluetooth disconnect " + deviceName);
 }
 
 bool ApiSystem::removeBluetoothDevice(const std::string& deviceName)
 {
-	return executeScript("rocknix-bluetooth remove " + deviceName);
+	return executeScript("unofficialos-bluetooth remove " + deviceName);
 }
 
 bool ApiSystem::scanNewBluetooth(const std::function<void(const std::string)>& func)
 {
-	return executeScript("rocknix-bluetooth trust input", func).second == 0;
+	return executeScript("unofficialos-bluetooth trust input", func).second == 0;
 }
 
 std::vector<std::string> ApiSystem::getPairedBluetoothDeviceList()
 {
-	return executeEnumerationScript("rocknix-bluetooth list");
+	return executeEnumerationScript("unofficialos-bluetooth list");
 }
 
 std::vector<std::string> ApiSystem::getAvailableStorageDevices() 
 {
-	return executeEnumerationScript("rocknix-config storage list");
+	return executeEnumerationScript("unofficialos-config storage list");
 }
 
 std::vector<std::string> ApiSystem::getVideoModes(const std::string output)
@@ -541,7 +541,7 @@ std::vector<std::string> ApiSystem::getCustomRunners()
 
 std::vector<std::string> ApiSystem::getAvailableBackupDevices() 
 {
-	return executeEnumerationScript("rocknix-sync list");
+	return executeEnumerationScript("unofficialos-sync list");
 }
 
 std::vector<std::string> ApiSystem::getAvailableInstallDevices() 
@@ -561,7 +561,7 @@ std::vector<std::string> ApiSystem::getAvailableOverclocking()
 
 std::vector<std::string> ApiSystem::getSystemInformations() 
 {
-	return executeEnumerationScript("rocknix-info --full");
+	return executeEnumerationScript("unofficialos-info --full");
 }
 
 std::vector<BiosSystem> ApiSystem::getBiosInformations(const std::string system) 
@@ -570,7 +570,7 @@ std::vector<BiosSystem> ApiSystem::getBiosInformations(const std::string system)
 	BiosSystem current;
 	bool isCurrent = false;
 
-	std::string cmd = "rocknix-systems";
+	std::string cmd = "unofficialos-systems";
 	if (!system.empty())
 		cmd += " --filter " + system;
 
@@ -629,7 +629,7 @@ std::string ApiSystem::getCurrentStorage()
 #endif
 
 	std::ostringstream oss;
-	oss << "rocknix-config storage current";
+	oss << "unofficialos-config storage current";
 	FILE *pipe = popen(oss.str().c_str(), "r");
 	char line[1024];
 
@@ -657,7 +657,7 @@ std::string ApiSystem::getRumblePath()
 		if ((Utils::String::toLower(file).find("/retroid-pocket-gamepad") != std::string::npos) && (joypadPath.empty()))
 			joypadPath = file;
 
-		if ((Utils::String::toLower(file).find("/rocknix") != std::string::npos) && (joypadPath.empty()))
+		if ((Utils::String::toLower(file).find("/unofficialos") != std::string::npos) && (joypadPath.empty()))
 			joypadPath = file;
 	}
 
@@ -672,7 +672,7 @@ std::string ApiSystem::getRumblePath()
 
 bool ApiSystem::setStorage(std::string selected) 
 {
-	return executeScript("rocknix-config storage " + selected);
+	return executeScript("unofficialos-config storage " + selected);
 }
 
 bool ApiSystem::setButtonColorGameForce(std::string selected)
@@ -687,7 +687,7 @@ bool ApiSystem::setPowerLedGameForce(std::string selected)
 
 bool ApiSystem::forgetBluetoothControllers() 
 {
-	return executeScript("rocknix-config forgetBT");
+	return executeScript("unofficialos-config forgetBT");
 }
 
 std::string ApiSystem::getRootPassword() 
@@ -702,7 +702,7 @@ std::string ApiSystem::getRootPassword()
 
 std::vector<std::string> ApiSystem::getAvailableVideoOutputDevices() 
 {
-	return executeEnumerationScript("rocknix-config lsoutputs");
+	return executeEnumerationScript("unofficialos-config lsoutputs");
 }
 
 std::vector<std::string> ApiSystem::getAvailableAudioOutputDevices() 
@@ -1113,7 +1113,7 @@ std::vector<BatoceraBezel> ApiSystem::getBatoceraBezelsList()
 
 	std::vector<BatoceraBezel> res;
 
-	auto lines = executeEnumerationScript("rocknix-es-thebezelproject list");
+	auto lines = executeEnumerationScript("unofficialos-es-thebezelproject list");
 	for (auto line : lines)
 	{
 		auto parts = Utils::String::splitAny(line, " \t");
@@ -1138,12 +1138,12 @@ std::vector<BatoceraBezel> ApiSystem::getBatoceraBezelsList()
 
 std::pair<std::string, int> ApiSystem::installBatoceraBezel(std::string bezelsystem, const std::function<void(const std::string)>& func)
 {
-	return executeScript("rocknix-es-thebezelproject install " + bezelsystem, func);
+	return executeScript("unofficialos-es-thebezelproject install " + bezelsystem, func);
 }
 
 std::pair<std::string, int> ApiSystem::uninstallBatoceraBezel(std::string bezelsystem, const std::function<void(const std::string)>& func)
 {
-	return executeScript("rocknix-es-thebezelproject remove " + bezelsystem, func);
+	return executeScript("unofficialos-es-thebezelproject remove " + bezelsystem, func);
 }
 
 std::string ApiSystem::getMD5(const std::string fileName, bool fromZipContents)
@@ -1704,13 +1704,13 @@ bool ApiSystem::isScriptingSupported(ScriptId script)
 		executables.push_back("wifictl");
 		break;
 	case ApiSystem::BLUETOOTH:
-		executables.push_back("rocknix-bluetooth");
+		executables.push_back("unofficialos-bluetooth");
 		break;
 	case ApiSystem::RESOLUTION:
-		executables.push_back("rocknix-resolution");
+		executables.push_back("unofficialos-resolution");
 		break;
 	case ApiSystem::BIOSINFORMATION:
-		executables.push_back("rocknix-systems");
+		executables.push_back("unofficialos-systems");
 		break;
 	case ApiSystem::DISKFORMAT:
 		executables.push_back("batocera-format");
@@ -1729,7 +1729,7 @@ bool ApiSystem::isScriptingSupported(ScriptId script)
 		executables.push_back("batocera-store");
 		break;
 	case ApiSystem::THEBEZELPROJECT:
-		executables.push_back("rocknix-es-thebezelproject");
+		executables.push_back("unofficialos-es-thebezelproject");
 		break;		
 	case ApiSystem::PADSINFO:
 		executables.push_back("batocera-padsinfo");
@@ -1747,7 +1747,7 @@ bool ApiSystem::isScriptingSupported(ScriptId script)
 		executables.push_back("set-audio");
 		break;		
 	case ApiSystem::BACKUP:
-		executables.push_back("rocknix-sync");
+		executables.push_back("unofficialos-sync");
 		break;
 	case ApiSystem::INSTALL:
 		executables.push_back("batocera-install");
@@ -1756,7 +1756,7 @@ bool ApiSystem::isScriptingSupported(ScriptId script)
 		executables.push_back("batocera-support");
 		break;
 	case ApiSystem::UPGRADE:
-		executables.push_back("rocknix-update");
+		executables.push_back("unofficialos-update");
 		break;
 	case ApiSystem::SUSPEND:
 		return (Utils::FileSystem::exists("/usr/sbin/pm-suspend") && Utils::FileSystem::exists("/usr/bin/pm-is-supported") && executeScript("/usr/bin/pm-is-supported --suspend"));

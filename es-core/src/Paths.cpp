@@ -63,7 +63,7 @@ Paths::Paths()
 	mKodiPath = "/usr/bin/kodi";
 #endif
 
-#if defined(ROCKNIX)
+#if defined(UNOFFICIALOS)
 	mRootPath = "/storage";
 	mEmulationStationPath = getExePath();
 	mUserEmulationStationPath = "/storage/.config/emulationstation";

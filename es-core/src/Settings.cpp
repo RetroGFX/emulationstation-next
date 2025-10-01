@@ -216,7 +216,7 @@ void Settings::setDefaults()
 	mStringMap["GameTransitionStyle"] = "instant";
 
 	mStringMap["ThemeSet"] = "system-theme";
-	mStringMap["subset.distribution"] = "rocknix";
+	mStringMap["subset.distribution"] = "unofficialos";
 	mStringMap["subset.gamelist-layout"] = "metadata-on";
 	mStringMap["subset.status-bar"] = "on";
 	mStringMap["ScreenSaverBehavior"] = "black";

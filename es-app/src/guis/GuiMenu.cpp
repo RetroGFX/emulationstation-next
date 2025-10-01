@@ -156,7 +156,7 @@ GuiMenu::GuiMenu(Window *window, bool animate) : GuiComponent(window), mMenu(win
 	
 	if (isFullUI)
 	{
-#if defined(BATOCERA) || defined(ROCKNIX)
+#if defined(BATOCERA) || defined(UNOFFICIALOS)
 		addEntry(_("GAME SETTINGS").c_str(), true, [this] { openGamesSettings(); }, "iconGames");
 		addEntry(GuiControllersSettings::getControllersSettingsLabel(), true, [window] { GuiControllersSettings::openControllersSettings(window); }, "iconControllers");
 		addEntry(_("USER INTERFACE SETTINGS").c_str(), true, [this] { openUISettings(); }, "iconUI");
@@ -241,7 +241,7 @@ void GuiMenu::openResetOptions()
 
 	s->addGroup(_("DATA MANAGEMENT"));
 	s->addEntry(_("BACKUP CONFIGURATIONS"), true, [window] {
-	window->pushGui(new GuiMsgBox(window, _("WARNING THIS WILL RESTART EMULATIONSTATION!\n\nAFTER THE SCRIPT IS DONE REMEMBER TO COPY THE FILE /storage/roms/backup/ROCKNIX_BACKUP.zip TO SOME PLACE SAFE OR IT WILL BE DELETED ON NEXT REBOOT!\n\nBACKUP CURRENT CONFIG AND RESTART?"), _("YES"),
+	window->pushGui(new GuiMsgBox(window, _("WARNING THIS WILL RESTART EMULATIONSTATION!\n\nAFTER THE SCRIPT IS DONE REMEMBER TO COPY THE FILE /storage/roms/backup/UNOFFICIALOS_BACKUP.zip TO SOME PLACE SAFE OR IT WILL BE DELETED ON NEXT REBOOT!\n\nBACKUP CURRENT CONFIG AND RESTART?"), _("YES"),
 		[] {
 		Utils::Platform::runSystemCommand("/usr/bin/run \"/usr/bin/backuptool backup\"", "", nullptr);
 		}, _("NO"), nullptr));
@@ -357,8 +357,8 @@ void GuiMenu::addVersionInfo()
 
 	if (!ApiSystem::getInstance()->getVersion().empty())
 	{
-		if (ApiSystem::getInstance()->getApplicationName() == "ROCKNIX")
-			label = "ROCKNIX " + ApiSystem::getInstance()->getVersion() + " (" + ApiSystem::getInstance()->getVersion(true) + ")";
+		if (ApiSystem::getInstance()->getApplicationName() == "UNOFFICIALOS")
+			label = "UNOFFICIALOS " + ApiSystem::getInstance()->getVersion() + " (" + ApiSystem::getInstance()->getVersion(true) + ")";
 		else
 		{
 			std::string aboutInfo = ApiSystem::getInstance()->getApplicationName() + " V" + ApiSystem::getInstance()->getVersion();
@@ -816,7 +816,7 @@ void GuiMenu::openDeveloperSettings()
 	s->addSwitch(_("SHOW FRAMERATE"), _("Also turns on the emulator's native FPS counter, if available."), "DrawFramerate", true, nullptr);
 	s->addSwitch(_("VSYNC"), "VSync", true, [] { Renderer::setSwapInterval(); });
 
-#if defined(BATOCERA) || defined(ROCKNIX)
+#if defined(BATOCERA) || defined(UNOFFICIALOS)
 	// overscan
 	auto overscan_enabled = std::make_shared<SwitchComponent>(mWindow);
 	overscan_enabled->setState(Settings::getInstance()->getBool("Overscan"));
@@ -1158,7 +1158,7 @@ void GuiMenu::openDeveloperSettings()
 		s->addWithLabel(_("RETROARCH MENU DRIVER"), retroarchRgui);
 		s->addSaveFunc([retroarchRgui] { SystemConf::getInstance()->set("global.retroarch.menu_driver", retroarchRgui->getSelected()); });
 	}
-#if !defined(ROCKNIX)
+#if !defined(UNOFFICIALOS)
 	auto invertJoy = std::make_shared<SwitchComponent>(mWindow);
 	invertJoy->setState(Settings::getInstance()->getBool("InvertButtons"));
 	s->addWithDescription(_("SWITCH CONFIRM & CANCEL BUTTONS IN EMULATIONSTATION"), _("Switches the South and East buttons' functionality"), invertJoy);
@@ -1196,7 +1196,7 @@ void GuiMenu::openDeveloperSettings()
 	}
 //#endif
 
-#if defined(BATOCERA) || defined(ROCKNIX)
+#if defined(BATOCERA) || defined(UNOFFICIALOS)
 	// PS3 controller enable
 	auto enable_ps3 = std::make_shared<SwitchComponent>(mWindow);
 	enable_ps3->setState(SystemConf::getInstance()->getBool("controllers.ps3.enabled"));
@@ -1445,7 +1445,7 @@ void GuiMenu::openSystemSettings()
 	});
 
 	// Timezone
-#if defined(ROCKNIX)
+#if defined(UNOFFICIALOS)
 	auto tzChoices = std::make_shared<OptionListComponent<std::string> >(mWindow, _("SELECT YOUR TIME ZONE"), false);
 	std::string currentTZ = SystemConf::getInstance()->get("system.timezone");
 	if (currentTZ.empty())
@@ -1561,7 +1561,7 @@ void GuiMenu::openSystemSettings()
 	}
 #endif
 
-#if defined(BATOCERA) || defined(ROCKNIX)
+#if defined(BATOCERA) || defined(UNOFFICIALOS)
 	s->addGroup(_("HARDWARE"));
 #endif
 
@@ -1720,7 +1720,7 @@ void GuiMenu::openSystemSettings()
 		s->addWithLabel(_("AUTODETECT GAMES CARD"), mount_games);
 		mount_games->setOnChangedCallback([this, s, mount_games] {
 			SystemConf::getInstance()->setBool("system.automount", mount_games->getState());
-			Utils::Platform::runSystemCommand("/usr/bin/systemctl restart rocknix-automount", "", nullptr);
+			Utils::Platform::runSystemCommand("/usr/bin/systemctl restart unofficialos-automount", "", nullptr);
 		});
 		if (Utils::FileSystem::exists("/storage/.ms_supported") && MountGamesEnabled)
 		{
@@ -1731,7 +1731,7 @@ void GuiMenu::openSystemSettings()
 			overlayState->setOnChangedCallback([this, s, overlayState] {
 				bool overlayStateEnabled = overlayState->getState();
 				SystemConf::getInstance()->setBool("system.merged.storage", overlayState->getState());
-				Utils::Platform::runSystemCommand("/usr/bin/systemctl restart rocknix-automount", "", nullptr);
+				Utils::Platform::runSystemCommand("/usr/bin/systemctl restart unofficialos-automount", "", nullptr);
 			});
 			auto optionsMSDevice = std::make_shared<OptionListComponent<std::string> >(mWindow, _("MERGED STORAGE PRIMARY CARD"), false);
 			std::string selectedMSDevice = SystemConf::getInstance()->get("system.merged.device");
@@ -1747,7 +1747,7 @@ void GuiMenu::openSystemSettings()
 					mWindow->pushGui(new GuiMsgBox(mWindow, _("WARNING: CHANGING THE PRIMARY CARD CAN CAUSE ACCESS TO GAMES TO BE LOST, REQUIRING MANUAL INTERVENTION TO CORRECT. CONTINUE?"), _("YES"), [this, optionsMSDevice, selectedMSDevice]
 					{
 						SystemConf::getInstance()->set("system.merged.device", optionsMSDevice->getSelected());
-						Utils::Platform::runSystemCommand("/usr/bin/systemctl restart rocknix-automount " + optionsMSDevice->getSelected(), "", nullptr);
+						Utils::Platform::runSystemCommand("/usr/bin/systemctl restart unofficialos-automount " + optionsMSDevice->getSelected(), "", nullptr);
 					}, _("NO"), nullptr));
 				}
 			});
@@ -2255,7 +2255,7 @@ void GuiMenu::openSystemSettings()
 
 		if (SystemData::isNetplayActivated() && ApiSystem::getInstance()->isScriptingSupported(ApiSystem::NETPLAY))
 			s->addEntry(_("NETPLAY SETTINGS"), true, [this] { openNetplaySettings(); }, "iconNetplay");
-#if !defined(ROCKNIX)
+#if !defined(UNOFFICIALOS)
 		if (ApiSystem::getInstance()->isScriptingSupported(ApiSystem::BIOSINFORMATION))
 		{
 			s->addEntry(_("MISSING BIOS CHECK"), true, [this, s] { openMissingBiosSettings(); });
@@ -2380,7 +2380,7 @@ void GuiMenu::openSystemSettings()
         s->addEntry(_("MULTISCREENS"), true, [this] { openMultiScreensSettings(); });
 #endif
 
-#if defined(BATOCERA) || defined(ROCKNIX)
+#if defined(BATOCERA) || defined(UNOFFICIALOS)
 #ifdef X86_64
 	int red, green, blue;
 	if (ApiSystem::getInstance()->getLED(red, green, blue)) {
@@ -2646,7 +2646,7 @@ void GuiMenu::dtbOverlayItem(Window* mWindow, GuiSettings *s, const std::string 
 			mWindow->pushGui(new GuiMsgBox(mWindow, _("WARNING: You are altering "
 				"hardware parameters that may yield your system unstable or unbootable. "
 				"In this case you will need to recover by manually editing "
-				"extlinux/extlinux.conf on the ROCKNIX partition from a PC, by "
+				"extlinux/extlinux.conf on the UNOFFICIALOS partition from a PC, by "
 				"removing the whole line starting with: FDTOVERLAYS. \n "
 				"The changes will be applied on next reboot"),
 				_("Reboot now"), [] { Utils::Platform::quitES(Utils::Platform::QuitMode::REBOOT); },
@@ -3064,14 +3064,14 @@ void GuiMenu::addFeatureItem(Window* window, GuiSettings* settings, const Custom
 	{
 		item->add(_("AUTO"), "auto", storedValue.empty() || storedValue == "auto");
 
-#if !defined(ROCKNIX)
+#if !defined(UNOFFICIALOS)
 		auto shaders = ApiSystem::getInstance()->getShaderList(configName != "global" ? system : "", configName != "global" ? emulator : "", configName != "global" ? core : "");
 		if (shaders.size() > 0)
 		{
 #endif
 			item->add(_("NONE"), "none", storedValue == "none");
 
-#if !defined(ROCKNIX)
+#if !defined(UNOFFICIALOS)
 			for (auto shader : shaders)
 			  item->add(pgettext("game_options", Utils::String::toUpper(shader).c_str()), shader, storedValue == shader);
 		}
@@ -3085,14 +3085,14 @@ void GuiMenu::addFeatureItem(Window* window, GuiSettings* settings, const Custom
 	{
 		item->add(_("AUTO"), "auto", storedValue.empty() || storedValue == "auto");
 
-#if !defined(ROCKNIX)
+#if !defined(UNOFFICIALOS)
 		auto videofilters = ApiSystem::getInstance()->getVideoFilterList(configName != "global" ? system : "", configName != "global" ? emulator : "", configName != "global" ? core : "");
 		if (videofilters.size() > 0)
 		{
 #endif
 			item->add(_("NONE"), "none", storedValue == "none");
 
-#if !defined(ROCKNIX)
+#if !defined(UNOFFICIALOS)
 			for (auto videofilter : videofilters)
 				item->add(pgettext("game_options", Utils::String::toUpper(videofilter).c_str()), videofilter, storedValue == videofilter);
 		}
@@ -3361,7 +3361,7 @@ void GuiMenu::openGamesSettings()
 	if (SystemData::isNetplayActivated() && ApiSystem::getInstance()->isScriptingSupported(ApiSystem::NETPLAY))
 		s->addEntry(_("NETPLAY SETTINGS"), true, [this] { openNetplaySettings(); }, "iconNetplay");
 
-#if !defined(ROCKNIX)
+#if !defined(UNOFFICIALOS)
 	// Missing Bios
 	if (ApiSystem::getInstance()->isScriptingSupported(ApiSystem::BIOSINFORMATION))
 	{
@@ -3449,7 +3449,7 @@ void GuiMenu::openGamesSettings()
 	// Shaders preset
 	if (ApiSystem::getInstance()->isScriptingSupported(ApiSystem::SHADERS) && !hasGlobalFeature("shaderset"))
 	{
-#if !defined(ROCKNIX)
+#if !defined(UNOFFICIALOS)
 		auto installedShaders = ApiSystem::getInstance()->getShaderList("", "", "");
 		if (installedShaders.size() > 0)
 		{
@@ -3460,7 +3460,7 @@ void GuiMenu::openGamesSettings()
 			shaders_choices->add(_("AUTO"), "auto", currentShader.empty() || currentShader == "auto");
 			shaders_choices->add(_("NONE"), "none", currentShader == "none");
 
-#if !defined(ROCKNIX)
+#if !defined(UNOFFICIALOS)
 			for (auto shader : installedShaders)
 				shaders_choices->add(_(Utils::String::toUpper(shader).c_str()), shader, currentShader == shader);
 			
@@ -3474,13 +3474,13 @@ void GuiMenu::openGamesSettings()
 
 			s->addWithLabel(_("SHADER SET"), shaders_choices);
 			s->addSaveFunc([shaders_choices] { SystemConf::getInstance()->set("global.shaderset", shaders_choices->getSelected()); });
-#if !defined(ROCKNIX)
+#if !defined(UNOFFICIALOS)
 		}
 #endif
 	}
 
 	// Video Filters
-#if !defined(ROCKNIX)
+#if !defined(UNOFFICIALOS)
 	if (ApiSystem::getInstance()->isScriptingSupported(ApiSystem::VIDEOFILTERS) && !hasGlobalFeature("videofilters"))
 	{
 		auto installedVideofilters = ApiSystem::getInstance()->getVideoFilterList("", "", "");
@@ -3496,7 +3496,7 @@ void GuiMenu::openGamesSettings()
 			videofilters_choices->add(_("AUTO"), "auto", currentVideofilter.empty() || currentVideofilter == "auto");
 			videofilters_choices->add(_("NONE"), "none", currentVideofilter == "none");
 
-#if !defined(ROCKNIX)
+#if !defined(UNOFFICIALOS)
 			for (auto videofilter : installedVideofilters)
 				videofilters_choices->add(_(Utils::String::toUpper(videofilter).c_str()), videofilter, currentVideofilter == videofilter);
 
@@ -3510,7 +3510,7 @@ void GuiMenu::openGamesSettings()
 
 			s->addWithLabel(_("VIDEO FILTER"), videofilters_choices);
 			s->addSaveFunc([videofilters_choices] { SystemConf::getInstance()->set("global.videofilters", videofilters_choices->getSelected()); });
-#if !defined(ROCKNIX)
+#if !defined(UNOFFICIALOS)
 		}
 #endif
 	}
@@ -4253,7 +4253,7 @@ void GuiMenu::openThemeConfiguration(Window* mWindow, GuiComponent* s, std::shar
 				if (Settings::getInstance()->setString(system->getName() + ".ShowCheevosIcon", showCheevos->getSelected()))
 					themeconfig->setVariable("reloadAll", true);
 			});
-#if !defined(ROCKNIX)
+#if !defined(UNOFFICIALOS)
 		// Show gun icons
 		auto defGI = Settings::getInstance()->getBool("ShowGunIconOnGames") ? _("YES") : _("NO");
 		auto curGI = Settings::getInstance()->getString(system->getName() + ".ShowGunIconOnGames");
@@ -4625,7 +4625,7 @@ void GuiMenu::openUISettings()
 		}		
 	}
 
-#if defined(ROCKNIX)
+#if defined(UNOFFICIALOS)
 	s->addGroup(_("CONTROL OPTIONS"));
 	auto invertJoy = std::make_shared<SwitchComponent>(mWindow);
 	invertJoy->setState(Settings::getInstance()->getBool("InvertButtons"));
@@ -4674,7 +4674,7 @@ void GuiMenu::openUISettings()
 		s->addOptionList(_("SHOW BATTERY STATUS"), { { _("NO"), "" },{ _("ICON"), "icon" },{ _("ICON AND TEXT"), "text" } }, "ShowBattery", true);
 
 	s->addGroup(_("GAMELIST OPTIONS"));
-#if defined(ROCKNIX)
+#if defined(UNOFFICIALOS)
 	// Enable Video Previews
 	auto enable_preview = std::make_shared<SwitchComponent>(mWindow);
 	enable_preview->setState(Settings::getInstance()->getBool("EnableVideoPreviews"));
@@ -4690,7 +4690,7 @@ void GuiMenu::openUISettings()
 	s->addSwitch(_("SHOW SAVESTATE ICON"), "ShowSaveStates", true, [s] { s->setVariable("reloadAll", true); });
 	s->addSwitch(_("SHOW MANUAL ICON"), "ShowManualIcon", true, [s] { s->setVariable("reloadAll", true); });	
 	s->addSwitch(_("SHOW RETROACHIEVEMENTS ICON"), "ShowCheevosIcon", true, [s] { s->setVariable("reloadAll", true); });
-#if !defined(ROCKNIX)
+#if !defined(UNOFFICIALOS)
 	s->addSwitch(_("SHOW GUN ICON"), "ShowGunIconOnGames", true, [s] { s->setVariable("reloadAll", true); });
 	s->addSwitch(_("SHOW WHEEL ICON"), "ShowWheelIconOnGames", true, [s] { s->setVariable("reloadAll", true); });
 	s->addSwitch(_("SHOW TRACKBALL ICON"), "ShowTrackballIconOnGames", true, [s] { s->setVariable("reloadAll", true); });
@@ -5507,7 +5507,7 @@ void GuiMenu::popSpecificConfigurationGui(Window* mWindow, std::string title, st
 	if (ApiSystem::getInstance()->isScriptingSupported(ApiSystem::SHADERS) &&
 		systemData->isFeatureSupported(currentEmulator, currentCore, EmulatorFeatures::shaders))
 	{
-#if !defined(ROCKNIX)
+#if !defined(UNOFFICIALOS)
 		auto installedShaders = ApiSystem::getInstance()->getShaderList(systemData->getName(), currentEmulator, currentCore);
 		if (installedShaders.size() > 0)
 		{
@@ -5518,7 +5518,7 @@ void GuiMenu::popSpecificConfigurationGui(Window* mWindow, std::string title, st
 			shaders_choices->add(_("AUTO"), "auto", currentShader.empty() || currentShader == "auto");
 			shaders_choices->add(_("NONE"), "none", currentShader == "none");
 
-#if !defined(ROCKNIX)
+#if !defined(UNOFFICIALOS)
 			for (auto shader : installedShaders)
 				shaders_choices->add(_(Utils::String::toUpper(shader).c_str()), shader, currentShader == shader);
 
@@ -5532,13 +5532,13 @@ void GuiMenu::popSpecificConfigurationGui(Window* mWindow, std::string title, st
 
 			systemConfiguration->addWithLabel(_("SHADER SET"), shaders_choices);
 			systemConfiguration->addSaveFunc([configName, shaders_choices] { SystemConf::getInstance()->set(configName + ".shaderset", shaders_choices->getSelected()); });
-#if !defined(ROCKNIX)
+#if !defined(UNOFFICIALOS)
 		}
 #endif
 	}
 
 	// Video Filters preset
-#if !defined(ROCKNIX)
+#if !defined(UNOFFICIALOS)
 	if (ApiSystem::getInstance()->isScriptingSupported(ApiSystem::VIDEOFILTERS) &&
 		systemData->isFeatureSupported(currentEmulator, currentCore, EmulatorFeatures::videofilters))
 	{
@@ -5556,7 +5556,7 @@ void GuiMenu::popSpecificConfigurationGui(Window* mWindow, std::string title, st
 			videofilters_choices->add(_("AUTO"), "auto", currentVideofilter.empty() || currentVideofilter == "auto");
 			videofilters_choices->add(_("NONE"), "none", currentVideofilter == "none");
 
-#if !defined(ROCKNIX)
+#if !defined(UNOFFICIALOS)
 			for (auto videofilter : installedVideofilters)
 				videofilters_choices->add(_(Utils::String::toUpper(videofilter).c_str()), videofilter, currentVideofilter == videofilter);
 
@@ -5570,7 +5570,7 @@ void GuiMenu::popSpecificConfigurationGui(Window* mWindow, std::string title, st
 
 			systemConfiguration->addWithLabel(_("VIDEO FILTER"), videofilters_choices);
 			systemConfiguration->addSaveFunc([configName, videofilters_choices] { SystemConf::getInstance()->set(configName + ".videofilter", videofilters_choices->getSelected()); });
-#if !defined(ROCKNIX)
+#if !defined(UNOFFICIALOS)
 		}
 #endif
 	}
